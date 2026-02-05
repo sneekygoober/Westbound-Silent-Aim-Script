@@ -93,19 +93,28 @@ local init = function()
 
     local old; old = clonefunction(hookfunction(f, newcclosure(function(...)
         local args = {...};
-        if args[1] and args[2] and args[5] then
-            local c = getTarget();
-            if c then
-                print(Players:GetPlayerFromCharacter(c.Parent));
-                args[1] = c;
-                args[2] = c.Position;
-                args[5].HitPosition = c.Position;
-                args[5].HitPart = c;
-                return old(unpack(args));
-            end;
+        local c = getTarget();
+        if c and c.Parent then
+            local pos = c.Position;
+            local norm = Vector3.new(0, 1, 0);
+            local mat = c.Material or Enum.Material.Flesh;
+            args[1] = c;
+            args[2] = pos;
+            args[3] = norm;
+            args[4] = mat;
+            args[5].HitHum = c.Parent:FindFirstChildOfClass("Humanoid");
+            args[5].RootPosition = (c.Name == "HumanoidRootPart" and pos) or (c.Parent:FindFirstChild("HumanoidRootPart") and c.Parent.HumanoidRootPart.Position);
+            return old(unpack(args));
         end;
 
-        return old(...);
+        if args[1] and args[1].Parent then
+            return old(...);
+        end;
+
+        return {
+            ["Hit"] = nil,
+            ["EndPoint"] = args[2] or Vector3.new(0,0,0)
+        };
     end)));
 end;
 
