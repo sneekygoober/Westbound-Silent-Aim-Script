@@ -37,8 +37,8 @@ local _mode = false;
 local isSameTeam = function(player)
     if not player or not player:IsA("Player") then return false; end;
 
-    local myTeam = plr.Team.Name;
-    local theirTeam = player.Team.Name;
+    local myTeam = plr.Team and plr.Team.Name;
+    local theirTeam = player.Team and player.Team.Name;
 
     if theirTeam == "Civilians" then
         return true;
@@ -85,7 +85,11 @@ end;
 
 local init = function()
     local f = loadstring(game:HttpGet("https://raw.githubusercontent.com/sneekygoober/sneeky-s-filtergc/refs/heads/main/main.luau"))()(Hit, false, "Window", "Frying Pan", "Head", "Eyes", "Rein", "Hit", "EndPoint", "Handle");
-    if not f then return warn("Script failed to find function"); end;
+    if not f then
+        mode.Text = "Script failed";
+        task.delay(1, function() main:Destroy(); end);
+        return warn("Script failed to find function");
+    end;
 
     local old; old = clonefunction(hookfunction(f, newcclosure(function(...)
         local args = {...};
