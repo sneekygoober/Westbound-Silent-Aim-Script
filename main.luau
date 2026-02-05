@@ -65,7 +65,7 @@ local getTarget = function(): BasePart
 
         local char;
         if _mode then char = targ.Character; else char = targ; end;
-        if not char or char:FindFirstChildOfClass("ForceField") then continue; end;
+        if not char or char:FindFirstChildOfClass("ForceField") or (char:FindFirstChild("Humanoid") and char.Humanoid.Health <= 0) then continue; end;
 
         local tPart: BasePart = char:FindFirstChild("Head") or char.PrimaryPart or char:FindFirstChild("HumanoidRootPart");
         if not tPart then continue; end;
