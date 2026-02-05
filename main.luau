@@ -5,8 +5,8 @@ local clonefunction = clonefunction or function(f: (...any) -> (...any)) return 
 local newcclosure = newcclosure or clonefunction;
 local executor = (identifyexecutor and select(2, pcall(identifyexecutor))) and identifyexecutor() or "Your executor";
 
-if not (hookfunction and filtergc or (getgc and debug.getconstants)) then
-    return error(executor .. " is missing " .. (not hookfunction and "hookfunction " or "") .. (not (filtergc and (getgc and debug.getconstants)) and "filtergc getgc debug.getconstants" or ""));
+if not (hookfunction and require) then
+    return error(executor .. " is missing " .. (not hookfunction and "hookfunction " or "") .. (not require and "require" or ""));
 end;
 
 local Players: Players = cloneref(game:GetService("Players"));
@@ -22,8 +22,6 @@ local mouse = plr:GetMouse();
 local Hit = RS.GunScripts.CreateShot.Hit;
 local Animals: Folder = workspace.Animals;
 
-local teams = loadstring(game:HttpGet("https://raw.githubusercontent.com/sneekygoober/Westbound-Silent-Aim-Script/refs/heads/main/Teams.luau"))();
-
 local main = Instance.new("ScreenGui", hui);
 main.Name = "";
 
@@ -36,34 +34,29 @@ mode.Size = UDim2.new(0.1, 0, 0.1, 0);
 
 local _mode = false;
 
-local isSameTeam = function(player: Player)
-    if not player:IsA("Player") then return false; end;
-    if teams[player.Team.Name] == 0 then return true; end;
-    return teams[player.Team.Name] == teams[plr.Team.Name];
-end;
+local isSameTeam = function(player)
+    if not player or not player:IsA("Player") then return false; end;
 
-local isVisible = function(part: BasePart, origin: Vector3): (boolean, Instance?)
-    local char = plr.Character;
-    if not char then return false, nil; end;
+    local myTeam = plr.Team.Name;
+    local theirTeam = player.Team.Name;
 
-    local rp = RaycastParams.new();
-    rp.FilterType = Enum.RaycastFilterType.Exclude;
-    rp.FilterDescendantsInstances = {char};
-    rp.IgnoreWater = true;
-
-    local dir = part.Position - origin;
-    local result: RaycastResult = workspace:Raycast(origin, dir, rp);
-    if not result then return true, nil; end;
-
-    if result.Instance:IsDescendantOf(part.Parent) then
-        return true, result.Instance;
+    if theirTeam == "Civilians" then
+        return true;
     end;
 
-    return false, result.Instance;
+    if myTeam == "Cowboys" and theirTeam == "Cowboys" then
+        return true;
+    end;
+
+    if myTeam == "Outlaws" and theirTeam == "Outlaws" then
+        return false;
+    end;
+
+    return false;
 end;
 
-local getTarget = function(origin: Vector3): BasePart
-    local cPart, cDistance = nil, math.huge;
+local getTarget = function(): BasePart
+    local cPart, cDistance = nil, 250;
 
     local group = _mode and Players or Animals;
 
@@ -79,14 +72,6 @@ local getTarget = function(origin: Vector3): BasePart
 
         local pos, onScreen = cam:WorldToViewportPoint(tPart.Position);
         if not onScreen then continue; end;
-
-        local v, nTPart = isVisible(tPart, origin);
-        if not v then
-            v, nTPart = isVisible(char.PrimaryPart or char:FindFirstChild("HumanoidRootPart"), origin);
-            if not v then continue; end;
-        end;
-
-        if nTPart then tPart = nTPart; end;
 
         local distance = (Vector2.new(pos.X, pos.Y) - Vector2.new(mouse.X, mouse.Y)).Magnitude;
         if distance < cDistance then
@@ -104,14 +89,14 @@ local init = function()
 
     local old; old = clonefunction(hookfunction(f, newcclosure(function(...)
         local args = {...};
-        if args[1] and args[2] and args[5] and args[5]["cframe"] and args[5]["cframe"]["p"] then
-            local c = getTarget(args[5].cframe.p);
+        if args[1] and args[2] and args[5] then
+            local c = getTarget();
             if c then
-                local npos = c.Position;
+                print(Players:GetPlayerFromCharacter(c.Parent));
                 args[1] = c;
-                args[2] = npos;
-                args[5]["HitPosition"] = npos;
-                args[5]["HitPart"] = c;
+                args[2] = c.Position;
+                args[5].HitPosition = c.Position;
+                args[5].HitPart = c;
                 return old(unpack(args));
             end;
         end;
