@@ -104,17 +104,12 @@ local init = function()
             args[4] = mat;
             args[5].HitHum = c.Parent:FindFirstChildOfClass("Humanoid");
             args[5].RootPosition = (c.Name == "HumanoidRootPart" and pos) or (c.Parent:FindFirstChild("HumanoidRootPart") and c.Parent.HumanoidRootPart.Position);
-            return old(unpack(args));
+            local s, r = pcall(old, unpack(args));
+            if s then return r; end;
+            warn("Error: " .. r);
         end;
 
-        if args[1] and args[1].Parent then
-            return old(...);
-        end;
-
-        return {
-            ["Hit"] = nil,
-            ["EndPoint"] = args[2] or Vector3.new(0,0,0)
-        };
+        return old(...);
     end)));
 end;
 
