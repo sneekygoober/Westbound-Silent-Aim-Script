@@ -122,4 +122,4 @@ mode.MouseButton1Click:Connect(function()
     mode.Text = _mode and "Target: Players" or "Target: Animals";
 end);
 
-SG["success"]("Silent aim successfully executed!\nClick the "Click Me!" button to load targets!\nIf you have any issues press F9 or type /console in chat and then send me a screenshot of the console.");
+SG["success"]("Silent aim successfully executed!\nClick the \"Click Me!\" button to load targets!\nIf you have any issues press F9 or type /console in chat and then send me a screenshot of the console.");
