@@ -4,9 +4,12 @@ local cloneref = cloneref or function(i: Instance) return i; end;
 local clonefunction = clonefunction or function(f: (...any) -> (...any)) return f; end;
 local newcclosure = newcclosure or clonefunction;
 local executor = (identifyexecutor and select(2, pcall(identifyexecutor))) and identifyexecutor() or "Your executor";
+local SG = loadstring(game:HttpGet("https://raw.githubusercontent.com/sneekygoober/sneeky-s-notifications/refs/heads/main/main.luau"))();
 
 if not (hookfunction and require) then
-    return error(executor .. " is missing " .. (not hookfunction and "hookfunction " or "") .. (not require and "require" or ""));
+    local err = executor .. " is missing " .. (not hookfunction and "hookfunction " or "") .. (not require and "require" or "");
+    SG["error"](err);
+    return error(err);
 end;
 
 local Players: Players = cloneref(game:GetService("Players"));
@@ -118,3 +121,5 @@ mode.MouseButton1Click:Connect(function()
     if mode.Text == "Click Me!" then init(); end;
     mode.Text = _mode and "Target: Players" or "Target: Animals";
 end);
+
+SG["success"]("Silent aim successfully executed!\nClick the "Click Me!" button to load targets!\nIf you have any issues press F9 or type /console in chat and then send me a screenshot of the console.");
