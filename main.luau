@@ -16,11 +16,15 @@ local Players: Players = cloneref(game:GetService("Players"));
 local RS: ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
 local CoreGui: CoreGui = cloneref(game:GetService("CoreGui"));
 local hui: BasePlayerGui | Folder = (gethui and cloneref(gethui())) or CoreGui:FindFirstChild("RobloxGui") or CoreGui;
+local UIS: UserInputService = cloneref(game:GetService("UserInputService"));
 
 local plr = Players.LocalPlayer;
 local cam = workspace.CurrentCamera;
 
-local mouse = plr:GetMouse();
+local mouse: Mouse?;
+if not UIS.TouchEnabled and UIS.MouseEnabled and UIS.KeyboardEnabled then
+    mouse = plr:GetMouse();
+end;
 
 local Hit = RS.GunScripts.CreateShot.Hit;
 local Animals: Folder = workspace.Animals;
